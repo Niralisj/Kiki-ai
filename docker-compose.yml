@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # PostgreSQL for Kestra
   postgres:
@@ -23,6 +21,8 @@ services:
   kestra:
     image: kestra/kestra:latest
     container_name: kiki-kestra
+    # THIS IS THE CRITICAL LINE THAT WAS MISSING!
+    command: server standalone
     ports:
       - "8080:8080"
       - "8081:8081"
@@ -86,3 +86,4 @@ volumes:
 networks:
   kiki-network:
     driver: bridge
+    
