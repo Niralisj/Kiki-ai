@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
           content: scenarioPrompts[scenarioId]
         }
       ],
-
+       model: 'llama-3.3-70b-versatile',
       temperature: 0.7,
       max_tokens: 300
     })
