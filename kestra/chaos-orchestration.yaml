@@ -1,0 +1,77 @@
+id: chaos-engineering-workflow
+namespace: kiki.ai
+
+description: Automated chaos engineering orchestration with AI analysis
+
+inputs:
+  - id: scenario
+    type: STRING
+    defaults: pod-delete
+    description: Chaos scenario to execute
+
+tasks:
+  # Task 1: Fetch cluster status before chaos
+  - id: fetch-cluster-status-before
+    type: io.kestra.plugin.core.http.Request
+    uri: http://frontend:3000/api/cluster/status
+    method: GET
+    description: Get current cluster health before running chaos
+
+  # Task 2: Run the chaos scenario
+  - id: run-chaos-scenario
+    type: io.kestra.plugin.core.http.Request
+    uri: http://frontend:3000/api/chaos/run
+    method: POST
+    contentType: application/json
+    body: |
+      {
+        "scenarioId": "{{ inputs.scenario }}"
+      }
+    description: Execute chaos engineering scenario
+
+  # Task 3: Parse AI analysis response
+  - id: parse-analysis
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      === Chaos Scenario Execution Complete ===
+      Scenario: {{ inputs.scenario }}
+      Analysis: {{ outputs.run-chaos-scenario.body.analysis }}
+      Score Change: {{ outputs.run-chaos-scenario.body.scoreChange }}
+      Success: {{ outputs.run-chaos-scenario.body.success }}
+    level: INFO
+
+  # Task 4: Fetch cluster status after chaos
+  - id: fetch-cluster-status-after
+    type: io.kestra.plugin.core.http.Request
+    uri: http://frontend:3000/api/cluster/status
+    method: GET
+    description: Get cluster health after chaos scenario
+
+  # Task 5: Compare results
+  - id: log-comparison
+    type: io.kestra.plugin.core.log.Log
+    message: |
+      === Status Comparison ===
+      Before: {{ outputs['fetch-cluster-status-before'].body }}
+      After: {{ outputs['fetch-cluster-status-after'].body }}
+    level: INFO
+
+triggers:
+  # Daily automated chaos at 10 AM
+  - id: daily-chaos-trigger
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 10 * * *"
+    inputs:
+      scenario: pod-delete
+
+  # Weekly advanced chaos on Mondays at 2 PM
+  - id: weekly-advanced-chaos
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 14 * * 1"
+    inputs:
+      scenario: memory-leak
+
+labels:
+  environment: production
+  team: platform
+  app: kiki-ai
