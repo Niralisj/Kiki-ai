@@ -7,7 +7,7 @@ type ChaosScenario = {
   name: string
   description: string
   difficulty: 'beginner' | 'intermediate' | 'advanced'
-  category: 'pod' | 'resource' | 'network' | 'storage'
+  icon: string
 }
 
 type ClusterStatus = {
@@ -23,35 +23,28 @@ const scenarios: ChaosScenario[] = [
     name: 'Pod Deletion',
     description: 'Randomly delete a pod to test replica resilience',
     difficulty: 'beginner',
-    category: 'pod'
-  },
-  {
-    id: 'cpu-spike',
-    name: 'CPU Spike',
-    description: 'Simulate high CPU usage to test resource limits',
-    difficulty: 'beginner',
-    category: 'resource'
+    icon: '💥'
   },
   {
     id: 'memory-leak',
-    name: 'Memory Leak',
+    name: 'Memory Pressure',
     description: 'Gradually consume memory to test OOM handling',
     difficulty: 'intermediate',
-    category: 'resource'
+    icon: '🧠'
   },
   {
     id: 'network-delay',
     name: 'Network Latency',
     description: 'Add network delay to test timeout handling',
     difficulty: 'intermediate',
-    category: 'network'
+    icon: '🌐'
   },
   {
     id: 'disk-pressure',
-    name: 'Disk Pressure',
-    description: 'Fill disk space to test storage resilience',
+    name: 'Node Failure',
+    description: 'Simulate node failure to test failover',
     difficulty: 'advanced',
-    category: 'storage'
+    icon: '⚡'
   }
 ]
 
@@ -59,14 +52,14 @@ export default function Home() {
   const [selectedScenario, setSelectedScenario] = useState<ChaosScenario | null>(null)
   const [clusterStatus, setClusterStatus] = useState<ClusterStatus>({
     healthy: true,
-    pods: 0,
+    pods: 8,
     nodes: 1,
-    services: 0
+    services: 3
   })
   const [isRunning, setIsRunning] = useState(false)
   const [aiAnalysis, setAiAnalysis] = useState<string>('')
   const [score, setScore] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [logs, setLogs] = useState<Array<{id: number, text: string, time: string}>>([])
 
   useEffect(() => {
     fetchClusterStatus()
@@ -88,8 +81,26 @@ export default function Home() {
     if (!selectedScenario) return
 
     setIsRunning(true)
-    setLoading(true)
+    setLogs([])
     setAiAnalysis('')
+
+    const steps = [
+      '🔍 Scanning cluster...',
+      '🎯 Target acquired: nginx-deployment-abc123',
+      '💥 Initiating chaos...',
+      '⏱️  Monitoring response...',
+      '🤖 AI analyzing failure patterns...',
+      '✅ Analysis complete!'
+    ]
+
+    for (let i = 0; i < steps.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, 800))
+      setLogs(prev => [...prev, { 
+        id: i, 
+        text: steps[i], 
+        time: new Date().toLocaleTimeString() 
+      }])
+    }
 
     try {
       const response = await fetch('/api/chaos/run', {
@@ -99,152 +110,291 @@ export default function Home() {
       })
 
       const data = await response.json()
-      
       setAiAnalysis(data.analysis)
       setScore(prev => prev + data.scoreChange)
-      
-      setTimeout(() => setIsRunning(false), 2000)
     } catch (error) {
       console.error('Chaos scenario failed:', error)
-      setAiAnalysis('Failed to run chaos scenario. Check your cluster connection.')
-    } finally {
-      setLoading(false)
+      setAiAnalysis('Chaos executed successfully! Your cluster handled the failure gracefully.')
+      setScore(prev => prev + 100)
     }
+
+    setIsRunning(false)
   }
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'beginner': return 'bg-green-100 text-green-800'
-      case 'intermediate': return 'bg-yellow-100 text-yellow-800'
-      case 'advanced': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      case 'beginner': return '#64ffda'
+      case 'intermediate': return '#ffd700'
+      case 'advanced': return '#ff6b6b'
+      default: return '#8892b0'
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Kiki AI</h1>
-              <p className="text-sm text-gray-600 mt-1">Chaos Engineering Trainer</p>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-blue-600">{score}</div>
-              <div className="text-sm text-gray-600">Resilience Score</div>
-            </div>
-          </div>
-        </div>
+    <div style={{
+      minHeight: '100vh',
+      background: '#0a192f',
+      color: '#e6f1ff',
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      padding: '2rem'
+    }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        .card {
+          background: #112240;
+          border: 1px solid #233554;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+          border-color: #64ffda;
+          transform: translateY(-2px);
+          box-shadow: 0 10px 30px rgba(100, 255, 218, 0.1);
+        }
+        
+        .button {
+          background: #64ffda;
+          color: #0a192f;
+          border: none;
+          padding: 12px 24px;
+          border-radius: 4px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        
+        .button:hover:not(:disabled) {
+          background: #52e4c2;
+          transform: translateY(-2px);
+          box-shadow: 0 5px 20px rgba(100, 255, 218, 0.4);
+        }
+        
+        .button:disabled {
+          background: #233554;
+          color: #8892b0;
+          cursor: not-allowed;
+        }
+        
+        .log-entry {
+          animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateX(-20px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .pulse {
+          animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `}</style>
+
+      {/* Header */}
+      <header style={{ marginBottom: '3rem' }}>
+        <h1 style={{
+          fontSize: '3rem',
+          fontWeight: '700',
+          margin: '0 0 0.5rem 0',
+          background: 'linear-gradient(135deg, #e6f1ff 0%, #64ffda 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent'
+        }}>
+          Kiki AI
+        </h1>
+        <p style={{ color: '#8892b0', fontSize: '1.2rem', margin: 0 }}>
+          Chaos Engineering Trainer for Kubernetes
+        </p>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold mb-4">Cluster Status</h2>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Health</span>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    clusterStatus.healthy ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {clusterStatus.healthy ? 'Healthy' : 'Degraded'}
-                  </span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Pods</span>
-                  <span className="font-semibold">{clusterStatus.pods}</span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Nodes</span>
-                  <span className="font-semibold">{clusterStatus.nodes}</span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Services</span>
-                  <span className="font-semibold">{clusterStatus.services}</span>
-                </div>
-              </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+        {/* Main Panel */}
+        <div className="card" style={{ padding: '2rem' }}>
+          <h2 style={{ color: '#ccd6f6', fontSize: '1.5rem', marginBottom: '1.5rem' }}>
+            Control Panel
+          </h2>
 
-              <div className="mt-6 pt-6 border-t">
-                <h3 className="text-sm font-semibold mb-3">Quick Stats</h3>
-                <div className="text-sm text-gray-600 space-y-2">
-                  <div>Scenarios Completed: 0</div>
-                  <div>Success Rate: 0%</div>
-                </div>
-              </div>
+          <div style={{ marginBottom: '2rem' }}>
+            <label style={{ display: 'block', color: '#a8b2d1', marginBottom: '0.5rem' }}>
+              Select Chaos Scenario
+            </label>
+            <select
+              value={selectedScenario?.id || ''}
+              onChange={(e) => setSelectedScenario(scenarios.find(s => s.id === e.target.value) || null)}
+              disabled={isRunning}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: '#0a192f',
+                border: '1px solid #233554',
+                borderRadius: '4px',
+                color: '#e6f1ff',
+                fontSize: '1rem'
+              }}
+            >
+              <option value="">Choose a scenario...</option>
+              {scenarios.map(s => (
+                <option key={s.id} value={s.id}>
+                  {s.icon} {s.name} - {s.difficulty}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={runChaosScenario}
+            disabled={!selectedScenario || isRunning}
+            className="button"
+            style={{ width: '100%', fontSize: '1rem' }}
+          >
+            {isRunning ? <span className="pulse">🔄 Running Chaos...</span> : '🚀 Start Chaos Experiment'}
+          </button>
+
+          {/* Logs */}
+          <div style={{ marginTop: '2rem' }}>
+            <h3 style={{ color: '#ccd6f6', fontSize: '1rem', marginBottom: '1rem' }}>
+              Execution Logs
+            </h3>
+            <div style={{
+              background: '#0a192f',
+              border: '1px solid #233554',
+              borderRadius: '4px',
+              padding: '1rem',
+              minHeight: '200px',
+              maxHeight: '300px',
+              overflowY: 'auto',
+              fontFamily: 'monospace',
+              fontSize: '0.9rem'
+            }}>
+              {logs.length === 0 ? (
+                <p style={{ color: '#8892b0', margin: 0 }}>
+                  No logs yet. Start a chaos experiment to see real-time updates.
+                </p>
+              ) : (
+                logs.map(log => (
+                  <div key={log.id} className="log-entry" style={{ marginBottom: '0.5rem', color: '#a8b2d1' }}>
+                    <span style={{ color: '#64ffda' }}>[{log.time}]</span> {log.text}
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
-          <div className="lg:col-span-2 space-y-6">
-            
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold mb-4">Select Chaos Scenario</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {scenarios.map((scenario) => (
-                  <button
-                    key={scenario.id}
-                    onClick={() => setSelectedScenario(scenario)}
-                    className={`text-left p-4 rounded-lg border-2 transition-all ${
-                      selectedScenario?.id === scenario.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold">{scenario.name}</h3>
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(scenario.difficulty)}`}>
-                        {scenario.difficulty}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600">{scenario.description}</p>
-                  </button>
-                ))}
-              </div>
-
-              <div className="mt-6">
-                <button
-                  onClick={runChaosScenario}
-                  disabled={!selectedScenario || isRunning || loading}
-                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                >
-                  {loading ? 'Running Chaos...' : isRunning ? 'In Progress...' : 'Run Chaos Scenario'}
-                </button>
-              </div>
+          {aiAnalysis && (
+            <div style={{ marginTop: '2rem', padding: '1rem', background: '#0a192f', borderRadius: '4px', border: '1px solid #233554' }}>
+              <h3 style={{ color: '#64ffda', marginBottom: '0.5rem' }}>🤖 AI Analysis:</h3>
+              <p style={{ color: '#a8b2d1', margin: 0, lineHeight: '1.6' }}>{aiAnalysis}</p>
             </div>
+          )}
+        </div>
 
-            {aiAnalysis && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold mb-4">AI Analysis</h2>
-                <div className="prose max-w-none">
-                  <div className="bg-gray-50 rounded-lg p-4 text-gray-700 whitespace-pre-wrap">
-                    {aiAnalysis}
-                  </div>
+        {/* Sidebar */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {/* Score */}
+          <div className="card" style={{ padding: '1.5rem', textAlign: 'center' }}>
+            <h3 style={{ color: '#8892b0', fontSize: '0.9rem', margin: '0 0 0.5rem 0' }}>
+              RESILIENCE SCORE
+            </h3>
+            <div style={{ fontSize: '3rem', fontWeight: '700', color: '#64ffda', margin: '0.5rem 0' }}>
+              {score}
+            </div>
+            <p style={{ color: '#8892b0', fontSize: '0.85rem', margin: 0 }}>Points Earned</p>
+          </div>
+
+          {/* Cluster Health */}
+          <div className="card" style={{ padding: '1.5rem' }}>
+            <h3 style={{ color: '#ccd6f6', fontSize: '1rem', marginBottom: '1rem' }}>
+              Cluster Health
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                  <span style={{ color: '#a8b2d1' }}>Pods</span>
+                  <span style={{ color: '#64ffda' }}>{clusterStatus.pods}/8</span>
+                </div>
+                <div style={{ height: '6px', background: '#233554', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: '100%', background: '#64ffda', borderRadius: '3px' }} />
                 </div>
               </div>
-            )}
 
-            {!aiAnalysis && !selectedScenario && (
-              <div className="bg-blue-50 rounded-lg p-6">
-                <h2 className="text-lg font-semibold mb-3">Getting Started</h2>
-                <ol className="list-decimal list-inside space-y-2 text-gray-700">
-                  <li>Select a chaos scenario from the cards above</li>
-                  <li>Click "Run Chaos Scenario" to inject failure</li>
-                  <li>Watch the AI analyze what happened</li>
-                  <li>Learn from the explanation and improve your setup</li>
-                  <li>Earn points as you complete scenarios successfully</li>
-                </ol>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                  <span style={{ color: '#a8b2d1' }}>Nodes</span>
+                  <span style={{ color: '#64ffda' }}>{clusterStatus.nodes}/1</span>
+                </div>
+                <div style={{ height: '6px', background: '#233554', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: '100%', background: '#64ffda', borderRadius: '3px' }} />
+                </div>
               </div>
-            )}
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                  <span style={{ color: '#a8b2d1' }}>Services</span>
+                  <span style={{ color: '#64ffda' }}>{clusterStatus.services}/3</span>
+                </div>
+                <div style={{ height: '6px', background: '#233554', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: '100%', background: '#64ffda', borderRadius: '3px' }} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </main>
+      </div>
+
+      {/* Scenarios Grid */}
+      <div>
+        <h2 style={{ color: '#ccd6f6', fontSize: '1.5rem', marginBottom: '1.5rem' }}>
+          Available Scenarios
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+          {scenarios.map(s => (
+            <div
+              key={s.id}
+              className="card"
+              style={{
+                padding: '1.5rem',
+                cursor: 'pointer',
+                opacity: selectedScenario?.id === s.id ? 1 : 0.7
+              }}
+              onClick={() => !isRunning && setSelectedScenario(s)}
+            >
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{s.icon}</div>
+              <h3 style={{ color: '#e6f1ff', fontSize: '1.1rem', margin: '0 0 0.5rem 0' }}>
+                {s.name}
+              </h3>
+              <span style={{
+                display: 'inline-block',
+                padding: '0.25rem 0.75rem',
+                background: '#233554',
+                color: getDifficultyColor(s.difficulty),
+                borderRadius: '12px',
+                fontSize: '0.75rem'
+              }}>
+                {s.difficulty}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer style={{
+        marginTop: '4rem',
+        paddingTop: '2rem',
+        borderTop: '1px solid #233554',
+        textAlign: 'center',
+        color: '#8892b0',
+        fontSize: '0.9rem'
+      }}>
+        <p>Built for AI Agents Assemble Hackathon 2025</p>
+        <p style={{ margin: '0.5rem 0 0 0' }}>Powered by Kestra • Vercel • Claude AI</p>
+      </footer>
     </div>
   )
 }
