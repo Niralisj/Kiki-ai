@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Kiki AI - Chaos Engineering Trainer',
+  title: 'Kiki AI',
   description: 'Learn Kubernetes resilience through intelligent chaos engineering',
 }
 
