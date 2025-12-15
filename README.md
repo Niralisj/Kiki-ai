@@ -1,7 +1,3 @@
-# 📝 Updated README.md
-
-Here's your improved README with real project details:
-
 # Kiki AI - Chaos Engineering Trainer for Kubernetes
 
 [![Deploy with Vercel](https://vercel.com/button)](https://kiki-ai.vercel.app)
