@@ -1,6 +1,8 @@
 # Kiki AI - Chaos Engineering Trainer for Kubernetes
 
 [![Deploy with Vercel](https://vercel.com/button)](https://kiki-ai.vercel.app)
+
+
 [![WeMakeDevs Hackathon 2025](https://img.shields.io/badge/Hackathon-WeMakeDevs%202025-purple)](https://www.wemakedevs.org/hackathons)
 [![YouTube Demo](https://img.shields.io/badge/Demo-YouTube-red)](https://youtu.be/qcUXKFbrIV4)
 
@@ -23,27 +25,6 @@ Watch the full demonstration: [https://youtu.be/qcUXKFbrIV4](https://youtu.be/qc
 - **Progressive Difficulty**: Beginner to advanced scenarios with scoring system
 - **Production-Ready**: Built with Next.js 14, TypeScript, and modern best practices
 
-## Architecture
-
-Kiki AI connects directly to your Kubernetes cluster and executes real chaos scenarios:
-
-┌─────────────────┐
-│   Next.js App   │  ← Browser Interface
-│   (Frontend)    │
-└────────┬────────┘
-         │
-    ┌────▼─────┐
-    │ GROQ AI  │  ← AI Analysis Engine
-    └──────────┘
-         │
-    ┌────▼────────────┐
-    │  Kubernetes API │  ← Real Cluster Access
-    │   (via kubectl) │
-    └─────────────────┘
-         │
-    ┌────▼────┐
-    │  Pods   │  ← Actual Chaos Execution
-    └─────────┘
 
 
 ## Tech Stack
