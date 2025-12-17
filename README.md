@@ -49,34 +49,7 @@ Watch the full demonstration: [https://youtu.be/qcUXKFbrIV4](https://youtu.be/qc
 - [kubectl](https://kubernetes.io/docs/tasks/tools/) configured
 - [GROQ API Key](https://console.groq.com/keys) (free)
 
-### Quick Start
 
-```bash
-# 1. Clone the repository
-git clone https://github.com/Niralisj/Kiki-ai.git
-cd Kiki-ai
-
-# 2. Start Minikube
-minikube start
-
-# 3. Deploy test application
-kubectl create deployment nginx --image=nginx:alpine --replicas=3
-kubectl expose deployment nginx --port=80 --type=NodePort
-
-# 4. Setup frontend
-cd frontend
-npm install
-
-# 5. Configure environment
-echo "GROQ_API_KEY=your_key_here" > .env.local
-echo "NEXT_PUBLIC_APP_URL=http://localhost:3000" >> .env.local
-
-# 6. Start development server
-npm run dev
-
-# 7. Open browser
-# Visit: http://localhost:3000
-```
 
 ### Watch Chaos in Real-Time
 
