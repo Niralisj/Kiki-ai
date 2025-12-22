@@ -208,20 +208,11 @@ Contributions are welcome! Please:
 
 
 
-## Resources
-
 - **Live Demo**: [https://kiki-ai.vercel.app](https://kiki-ai.vercel.app)
 - **Video Demo**: [https://youtu.be/qcUXKFbrIV4](https://youtu.be/qcUXKFbrIV4)
 - **GitHub**: [https://github.com/Niralisj/Kiki-ai](https://github.com/Niralisj/Kiki-ai)
 
 
-## Acknowledgments
-
-- **WeMakeDevs** for organizing the hackathon
-- **Groq** for fast AI inference
-- **Vercel** for seamless deployment
-- **Kubernetes Community** for excellent documentation
-- **Chaos Engineering Community** for inspiration
 
 
 **Nirali**
