@@ -1,6 +1,6 @@
 # Kiki AI - Chaos Engineering Trainer for Kubernetes
 
-[![Deploy with Vercel](https://vercel.com/button)](https://kiki-ai.vercel.app)
+[![Deploy with Vercel](https://kikiai-kohl.vercel.app/)
 
 
 [![WeMakeDevs Hackathon 2025](https://img.shields.io/badge/Hackathon-WeMakeDevs%202025-purple)](https://www.wemakedevs.org/hackathons)
