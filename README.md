@@ -217,7 +217,7 @@ Contributions are welcome! Please:
 
 **Nirali**
 - GitHub: [@Niralisj](https://github.com/Niralisj)
-- Project: [Kiki-ai](https://github.com/Niralisj/Kiki-ai)
+- Project: [Kiki-ai](https://kikiai-kohl.vercel.app/)
 
 ## License
 
